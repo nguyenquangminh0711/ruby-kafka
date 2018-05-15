@@ -36,5 +36,10 @@ module Kafka
     def is_control_record
       @message.is_control_record
     end
+
+    # @return [Hash] the headers of this message
+    def headers
+      @message.headers
+    end
   end
 end
