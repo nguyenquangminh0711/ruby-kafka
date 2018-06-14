@@ -179,7 +179,7 @@ module Kafka
     #
     # @raise [BufferOverflow] if the maximum buffer size has been reached.
     # @return [nil]
-    def produce(value, key: nil, topic:, partition: nil, partition_key: nil, create_time: Time.now)
+    def produce(value, key: nil, topic:, partition: nil, partition_key: nil, create_time: Time.now, headers: nil)
       message = PendingMessage.new(
         value && value.to_s,
         key && key.to_s,
@@ -187,6 +187,7 @@ module Kafka
         partition && Integer(partition),
         partition_key && partition_key.to_s,
         create_time,
+        headers && headers
       )
 
       if buffer_size >= @max_buffer_size
@@ -207,6 +208,7 @@ module Kafka
         key: key,
         topic: topic,
         create_time: create_time,
+        headers: headers,
         message_size: message.bytesize,
         buffer_size: buffer_size,
         max_buffer_size: @max_buffer_size,
@@ -357,6 +359,7 @@ module Kafka
             topic: message.topic,
             partition: partition,
             create_time: message.create_time,
+            headers: message.headers,
           )
         rescue Kafka::Error => e
           @instrumenter.instrument("topic_error.producer", {
@@ -395,7 +398,8 @@ module Kafka
             topic,
             partition,
             nil,
-            message.create_time
+            message.create_time,
+            message.headers
           )
         end
       end

@@ -118,7 +118,7 @@ module Kafka
     # @param retries [Integer] the number of times to retry the delivery before giving
     #   up.
     # @return [nil]
-    def deliver_message(value, key: nil, topic:, partition: nil, partition_key: nil, retries: 1)
+    def deliver_message(value, key: nil, topic:, partition: nil, partition_key: nil, retries: 1, headers: {})
       create_time = Time.now
 
       message = PendingMessage.new(
@@ -128,6 +128,7 @@ module Kafka
         partition,
         partition_key,
         create_time,
+        headers,
       )
 
       if partition.nil?
