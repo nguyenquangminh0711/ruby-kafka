@@ -21,7 +21,7 @@ module Kafka
 
       attr_reader :key, :value, :codec_id, :offset
 
-      attr_reader :bytesize, :create_time, :headers
+      attr_reader :bytesize, :create_time, :headers, :is_control_record
 
       def initialize(value:, key: nil, create_time: Time.now, codec_id: 0, offset: -1)
         @key = key
