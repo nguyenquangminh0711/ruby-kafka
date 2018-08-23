@@ -214,7 +214,7 @@ module Kafka
               create_time: message.create_time,
               key: message.key,
               value: message.value,
-              headers: message.headers
+              headers: message.&headers
             }
 
             # Instrument an event immediately so that subscribers don't have to wait until
