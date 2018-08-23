@@ -34,7 +34,7 @@ module Kafka
 
     def self.find_codec_by_id(codec_id)
       codec_name = CODEC_NAMES.fetch(codec_id) do
-        raise "Unknown codec id #{codec_id}"
+        raise Kafka::Error, "Unknown codec id #{codec_id}"
       end
 
       find_codec(codec_name)

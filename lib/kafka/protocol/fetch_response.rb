@@ -76,22 +76,26 @@ module Kafka
             messages = []
 
             magic_byte = messages_decoder.peek(MAGIC_BYTE_OFFSET, MAGIC_BYTE_LENGTH)[0].to_i
-            if magic_byte == RecordBatch::MAGIC_BYTE
-              until messages_decoder.eof?
-                begin
-                  record_batch = RecordBatch.decode(messages_decoder)
-                  messages += record_batch.records
-                rescue InsufficientDataMessage
-                  if messages.length > 0
-                    break
-                  else
-                    raise
+            begin
+              if magic_byte == RecordBatch::MAGIC_BYTE
+                until messages_decoder.eof?
+                  begin
+                    record_batch = RecordBatch.decode(messages_decoder)
+                    messages += record_batch.records
+                  rescue InsufficientDataMessage
+                    if messages.length > 0
+                      break
+                    else
+                      raise
+                    end
                   end
                 end
+              else
+                message_set = MessageSet.decode(messages_decoder)
+                messages = message_set.messages
               end
-            else
-              message_set = MessageSet.decode(messages_decoder)
-              messages = message_set.messages
+            rescue Kafka::Error => e
+              puts "[#{topic_name}/#{partition}] Message corrupted! Error: #{e}. First offset in batch: #{messages.first&.offset || "Null"}"
             end
 
             FetchedPartition.new(
